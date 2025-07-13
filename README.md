@@ -196,7 +196,3 @@ This project is licensed under the MIT License.
 
 ## Support
 
-For support, email support@blogvista.com or create an issue in the repository. 
-=======
-# mern-mini-blog-task
->>>>>>> a3407355c30d190f3994dbfe33dea384610d6a91
