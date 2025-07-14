@@ -61,10 +61,10 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   const navLinks = [
-    { to: '/', label: 'Home', icon: <Home className="w-5 h-5 md:w-6 md:h-6" /> },
-    { to: '/trending', label: 'Trending', icon: <TrendingUp className="w-5 h-5 md:w-6 md:h-6" /> },
-    { to: '/search', label: 'Search', icon: <Search className="w-5 h-5 md:w-6 md:h-6" /> },
-    { to: '/streak', label: 'Streak', icon: <Zap className="w-5 h-5 md:w-6 md:h-6" /> },
+    { to: '/', label: 'Home', icon: <Home className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" /> },
+    { to: '/trending', label: 'Trending', icon: <TrendingUp className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" /> },
+    { to: '/search', label: 'Search', icon: <Search className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" /> },
+    { to: '/streak', label: 'Streak', icon: <Zap className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6" /> },
   ];
 
   return (
@@ -99,7 +99,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 md:px-8 lg:px-16 relative z-10">
         <div className="flex flex-wrap justify-between items-center h-14 xs:h-16 md:h-18 lg:h-20 gap-y-1 xs:gap-y-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 group min-w-0 flex-shrink-0">
+          <Link to="/" className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 group min-w-0">
             <motion.div 
               style={{ 
                 background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
@@ -145,7 +145,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 lg:space-x-3 ml-1 xs:ml-2 sm:ml-4 md:ml-8 lg:ml-12 overflow-x-auto scrollbar-hide max-w-full min-w-0 flex-1 justify-end">
+          <div className="hidden md:flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 lg:space-x-3 ml-1 xs:ml-2 sm:ml-4 md:ml-8 lg:ml-12 overflow-x-auto scrollbar-hide max-w-full min-w-0">
             {navLinks.map((link, index) => (
               <motion.div
                 key={link.to}
@@ -157,7 +157,7 @@ const Navbar = () => {
               >
                 <Link
                   to={link.to}
-                  className={`flex items-center space-x-1 xs:space-x-2 px-2 xs:px-3 sm:px-5 py-2 xs:py-2 md:px-6 lg:px-8 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
+                  className={`flex items-center space-x-2 px-5 py-2 md:px-6 lg:px-8 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
                     location.pathname === link.to
                       ? 'shadow-lg'
                       : 'hover:shadow-md'
@@ -182,12 +182,9 @@ const Navbar = () => {
                     whileHover={{ rotate: 5, scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {/* Responsive icon size */}
-                    <span className="block xs:hidden">{React.cloneElement(link.icon, { className: 'w-4 h-4' })}</span>
-                    <span className="hidden xs:block">{React.cloneElement(link.icon, { className: 'w-5 h-5 md:w-6 md:h-6' })}</span>
+                    {link.icon}
                   </motion.div>
                   <motion.span
-                    className="hidden xs:inline truncate"
                     whileHover={{ x: 2 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -196,11 +193,12 @@ const Navbar = () => {
                 </Link>
               </motion.div>
             ))}
+
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 min-w-0 flex-1 justify-end">
-            {/* Theme Toggle */}
+          <div className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 min-w-0">
+            {/* Only show theme toggle on small screens, show all on md+ */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 180 }}
               whileTap={{ scale: 0.9 }}
@@ -210,7 +208,7 @@ const Navbar = () => {
                 color: 'var(--muted-foreground)', 
                 borderRadius: 'var(--radius)' 
               }}
-              className="w-8 h-8 xs:w-10 xs:h-10 md:w-12 md:h-12 flex items-center justify-center hover:bg-[var(--accent)] transition-all duration-200 relative overflow-hidden"
+              className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-[var(--accent)] transition-all duration-200 relative overflow-hidden"
               aria-label="Toggle theme"
             >
               <motion.div
@@ -226,14 +224,13 @@ const Navbar = () => {
                   exit={{ rotate: 90, opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {isDark ? <Sun className="w-6 h-6 md:w-7 md:h-7" /> : <Moon className="w-6 h-6 md:w-7 md:h-7" />}
+                  {isDark ? <Sun className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" /> : <Moon className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7" />}
                 </motion.div>
               </AnimatePresence>
             </motion.button>
-
-            {/* Auth Buttons */}
+            {/* Hide auth buttons on small screens, show on md+ */}
             {isAuthenticated ? (
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative hidden md:block" ref={dropdownRef}>
                 <motion.button
                   className="flex items-center space-x-2 px-2 py-1 sm:px-3 sm:py-2 rounded-full border shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group min-w-0"
                   style={{ 
@@ -356,10 +353,10 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-1 xs:space-x-2">
+              <div className="flex items-center space-x-3 hidden md:flex">
                 <Link
                   to="/login"
-                  className="px-2 xs:px-3 py-1 xs:py-2 rounded-lg font-medium text-xs xs:text-sm transition-all duration-200 hover:scale-105"
+                  className="px-5 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
                   style={{ color: 'var(--muted-foreground)' }}
                 >
                   Sign In
@@ -370,7 +367,7 @@ const Navbar = () => {
                 >
                   <Link
                     to="/register"
-                    className="px-3 xs:px-4 py-1 xs:py-2 rounded-lg font-medium text-xs xs:text-sm transition-all duration-200 shadow-xl hover:shadow-2xl relative overflow-hidden group"
+                    className="px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-xl hover:shadow-2xl relative overflow-hidden group"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
                       color: 'var(--primary-foreground)' 
@@ -407,10 +404,10 @@ const Navbar = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isMenuOpen ? 'close' : 'menu'}
-                  initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   {isMenuOpen ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <Menu className="w-5 h-5 md:w-6 md:h-6" />}
                 </motion.div>
@@ -423,10 +420,10 @@ const Navbar = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -24, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -24, height: 0 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
               className="md:hidden py-4 px-1 xs:px-2 sm:px-4 border-t"
               style={{ borderColor: 'var(--border)' }}
             >
@@ -457,6 +454,27 @@ const Navbar = () => {
                     <span className="truncate max-w-[60vw] xs:max-w-[120px] sm:max-w-[180px]">{link.label}</span>
                   </Link>
                 ))}
+                {/* Show auth buttons in hamburger menu on small screens */}
+                {!isAuthenticated && (
+                  <>
+                    <Link
+                      to="/login"
+                      className="flex items-center space-x-2 px-3 xs:px-5 py-3 xs:py-4 rounded-xl font-medium text-xs xs:text-sm sm:text-base transition-all duration-300 relative overflow-hidden truncate max-w-full hover:bg-[var(--muted)]"
+                      style={{ color: 'var(--muted-foreground)' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="truncate max-w-[60vw] xs:max-w-[120px] sm:max-w-[180px]">Sign In</span>
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="flex items-center space-x-2 px-3 xs:px-5 py-3 xs:py-4 rounded-xl font-medium text-xs xs:text-sm sm:text-base transition-all duration-300 relative overflow-hidden truncate max-w-full hover:bg-[var(--muted)]"
+                      style={{ color: 'var(--primary-foreground)', background: 'linear-gradient(135deg, var(--primary), var(--secondary))' }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="truncate max-w-[60vw] xs:max-w-[120px] sm:max-w-[180px]">Sign Up</span>
+                    </Link>
+                  </>
+                )}
                 {isAuthenticated && (
                   <Link
                     to="/create"
