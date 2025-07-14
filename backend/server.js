@@ -34,7 +34,7 @@ app.use('/api/', limiter);
 app.use(cors({
   origin: 'https://mern-mini-blog-task-1.onrender.com',
   credentials: true
-}));
+})) ; 
 
 // Body parsing middleware
 app.use(express.json({ limit: '30mb' }));
