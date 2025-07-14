@@ -199,7 +199,7 @@ const Navbar = () => {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 min-w-0">
+          <div className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 min-w-0 flex-1 justify-end">
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 180 }}
@@ -210,7 +210,7 @@ const Navbar = () => {
                 color: 'var(--muted-foreground)', 
                 borderRadius: 'var(--radius)' 
               }}
-              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:bg-[var(--accent)] transition-all duration-200 relative overflow-hidden"
+              className="w-8 h-8 xs:w-10 xs:h-10 md:w-12 md:h-12 flex items-center justify-center hover:bg-[var(--accent)] transition-all duration-200 relative overflow-hidden"
               aria-label="Toggle theme"
             >
               <motion.div
@@ -356,10 +356,10 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-1 xs:space-x-2">
                 <Link
                   to="/login"
-                  className="px-5 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105"
+                  className="px-2 xs:px-3 py-1 xs:py-2 rounded-lg font-medium text-xs xs:text-sm transition-all duration-200 hover:scale-105"
                   style={{ color: 'var(--muted-foreground)' }}
                 >
                   Sign In
@@ -370,7 +370,7 @@ const Navbar = () => {
                 >
                   <Link
                     to="/register"
-                    className="px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-xl hover:shadow-2xl relative overflow-hidden group"
+                    className="px-3 xs:px-4 py-1 xs:py-2 rounded-lg font-medium text-xs xs:text-sm transition-all duration-200 shadow-xl hover:shadow-2xl relative overflow-hidden group"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
                       color: 'var(--primary-foreground)' 
@@ -407,10 +407,10 @@ const Navbar = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isMenuOpen ? 'close' : 'menu'}
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                 >
                   {isMenuOpen ? <X className="w-5 h-5 md:w-6 md:h-6" /> : <Menu className="w-5 h-5 md:w-6 md:h-6" />}
                 </motion.div>
@@ -423,10 +423,10 @@ const Navbar = () => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: -24, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -24, height: 0 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="md:hidden py-4 px-1 xs:px-2 sm:px-4 border-t"
               style={{ borderColor: 'var(--border)' }}
             >
