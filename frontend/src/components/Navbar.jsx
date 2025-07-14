@@ -96,10 +96,10 @@ const Navbar = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16 relative z-10">
-        <div className="flex justify-between items-center h-16 md:h-18 lg:h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-8 lg:px-16 relative z-10">
+        <div className="flex flex-wrap justify-between items-center h-16 md:h-18 lg:h-20 gap-y-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
+          <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group min-w-0">
             <motion.div 
               style={{ 
                 background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
@@ -145,7 +145,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-3 ml-8 lg:ml-12">
+          <div className="hidden md:flex items-center space-x-1 sm:space-x-2 lg:space-x-3 ml-2 sm:ml-4 md:ml-8 lg:ml-12 overflow-x-auto scrollbar-hide max-w-full">
             {navLinks.map((link, index) => (
               <motion.div
                 key={link.to}
@@ -197,7 +197,7 @@ const Navbar = () => {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-4 md:space-x-6">
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 min-w-0">
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 180 }}
@@ -425,10 +425,10 @@ const Navbar = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden py-8 px-6 border-t"
+              className="md:hidden py-6 px-2 sm:px-4 border-t"
               style={{ borderColor: 'var(--border)' }}
             >
-              <div className="space-y-4">
+              <div className="space-y-2 sm:space-y-4">
                 {navLinks.map(link => (
                   <Link
                     key={link.to}
