@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLikes } from '../context/LikeContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../utils/config';
 
 const SearchPage = () => {
   const [query, setQuery] = useState('');
@@ -61,7 +62,7 @@ const SearchPage = () => {
         timeFrame: filters.timeFrame
       });
       
-      const response = await axios.get(`http://localhost:3000/api/posts/search?${params}`);
+      const response = await axios.get(`${API_BASE_URL}/posts/search?${params}`);
       setResults(response.data.data.posts);
     } catch (error) {
       console.error('Search error:', error);

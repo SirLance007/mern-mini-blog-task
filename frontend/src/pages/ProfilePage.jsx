@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/config';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -79,7 +80,7 @@ const ProfilePage = () => {
       setProfile(prev => ({ ...prev, avatar: base64Image }));
       
       // Save to backend
-      axios.put('http://localhost:3000/api/auth/profile', {
+      axios.put(`${API_BASE_URL}/auth/profile`, {
         name: profile.name,
         bio: profile.bio,
         avatar: base64Image,
@@ -132,7 +133,7 @@ const ProfilePage = () => {
     setIsSaving(true);
     
     try {
-      const response = await axios.put('http://localhost:3000/api/auth/profile', {
+      const response = await axios.put(`${API_BASE_URL}/auth/profile`, {
         name: profile.name,
         bio: profile.bio,
         avatar: profile.avatar,
@@ -158,7 +159,7 @@ const ProfilePage = () => {
     
     setLoadingPosts(true);
     try {
-      const response = await axios.get('http://localhost:3000/api/posts/my');
+      const response = await axios.get(`${API_BASE_URL}/posts/my`);
       setUserPosts(response.data.data.posts);
       setUserPostsLoaded(true);
     } catch (error) {
@@ -174,7 +175,7 @@ const ProfilePage = () => {
     
     setLoadingPosts(true);
     try {
-      const response = await axios.get('http://localhost:3000/api/posts/liked');
+      const response = await axios.get(`${API_BASE_URL}/posts/liked`);
       setLikedPosts(response.data.data.posts);
       setLikedPostsLoaded(true);
     } catch (error) {
@@ -220,7 +221,7 @@ const ProfilePage = () => {
     setDeletingPosts(prev => new Set([...prev, postId]));
     
     try {
-      await axios.delete(`http://localhost:3000/api/posts/${postId}`);
+      await axios.delete(`${API_BASE_URL}/posts/${postId}`);
       
       // Remove from local state
       setUserPosts(prev => prev.filter(post => post._id !== postId));

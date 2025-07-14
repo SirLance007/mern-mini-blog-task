@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../utils/config';
 
 const PostDetailPage = () => {
   const { id } = useParams();
@@ -43,7 +44,7 @@ const PostDetailPage = () => {
   const fetchPost = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3000/api/posts/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/posts/${id}`);
       const postData = response.data.data.post;
       setPost(postData);
       setIsLiked(postData.isLiked || false);
@@ -64,7 +65,7 @@ const PostDetailPage = () => {
     }
 
     try {
-      await axios.put(`http://localhost:3000/api/posts/${id}/like`);
+      await axios.put(`${API_BASE_URL}/posts/${id}/like`);
       setIsLiked(!isLiked);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
       toast.success(isLiked ? 'Post unliked' : 'Post liked!');
@@ -91,7 +92,7 @@ const PostDetailPage = () => {
 
     setSubmittingComment(true);
     try {
-      const response = await axios.post(`http://localhost:3000/api/posts/${id}/comments`, {
+      const response = await axios.post(`${API_BASE_URL}/posts/${id}/comments`, {
         content: newComment
       });
       
@@ -120,7 +121,7 @@ const PostDetailPage = () => {
 
     setDeletingPost(true);
     try {
-      await axios.delete(`http://localhost:3000/api/posts/${id}`);
+      await axios.delete(`${API_BASE_URL}/posts/${id}`);
       toast.success('Post deleted successfully!');
       
       // Notify streak page to refetch data
@@ -132,6 +133,36 @@ const PostDetailPage = () => {
       console.error('Error deleting post:', error);
     } finally {
       setDeletingPost(false);
+    }
+  };
+
+  const handleShare = () => {
+    const shareUrl = window.location.href;
+    const shareTitle = post.title || 'Check out this post!';
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        url: shareUrl
+      }).then(() => {
+        toast.success('Thanks for sharing!');
+      }).catch(() => {
+        toast.error('Share cancelled or failed.');
+      });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        toast.success('Link copied to clipboard!');
+      }, () => {
+        toast.error('Failed to copy link.');
+      });
+    } else {
+      // fallback for very old browsers
+      const input = document.createElement('input');
+      input.value = shareUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      toast.success('Link copied to clipboard!');
     }
   };
 
@@ -370,6 +401,7 @@ const PostDetailPage = () => {
         </div>
         
         <motion.button
+          onClick={handleShare}
           className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
           style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
           whileHover={{ scale: 1.05 }}

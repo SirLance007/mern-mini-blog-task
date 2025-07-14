@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -30,6 +30,7 @@ const Navbar = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = () => {
     logout();
@@ -41,6 +42,23 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   const navLinks = [
     { to: '/', label: 'Home', icon: <Home className="w-5 h-5 md:w-6 md:h-6" /> },
@@ -78,8 +96,8 @@ const Navbar = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16 relative z-10">
+        <div className="flex justify-between items-center h-16 md:h-18 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <motion.div 
@@ -127,7 +145,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3 ml-8 lg:ml-12">
             {navLinks.map((link, index) => (
               <motion.div
                 key={link.to}
@@ -139,7 +157,7 @@ const Navbar = () => {
               >
                 <Link
                   to={link.to}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
+                  className={`flex items-center space-x-2 px-5 py-2 md:px-6 lg:px-8 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
                     location.pathname === link.to
                       ? 'shadow-lg'
                       : 'hover:shadow-md'
@@ -179,7 +197,7 @@ const Navbar = () => {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4 md:space-x-6">
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 180 }}
@@ -213,13 +231,13 @@ const Navbar = () => {
 
             {/* Auth Buttons */}
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <motion.button
-                  className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center px-0 py-0 rounded-full border shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group"
+                  className="flex items-center space-x-2 px-2 py-1 sm:px-3 sm:py-2 rounded-full border shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden group min-w-0"
                   style={{ 
                     borderColor: 'var(--border)',
                     background: 'var(--card)',
-                    minWidth: 0 
+                    maxWidth: '200px'
                   }}
                   onClick={() => setDropdownOpen(v => !v)}
                   aria-label="User menu"
@@ -231,20 +249,20 @@ const Navbar = () => {
                     whileHover={{ opacity: 0.05 }}
                     transition={{ duration: 0.3 }}
                   />
-                  <div className="relative">
+                  <div className="relative flex-shrink-0">
                     <img
                       src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366f1&color=fff`}
                       alt="Avatar"
-                      className="w-full h-full rounded-full object-cover border-2 shadow-lg group-hover:scale-110 transition-transform duration-300"
+                      className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full object-cover border-2 shadow-lg group-hover:scale-110 transition-transform duration-300"
                       style={{ borderColor: 'var(--primary)', objectFit: 'cover', objectPosition: 'center' }}
                     />
                     <div 
-                      className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 bg-green-500 border-white shadow-sm"
+                      className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 bg-green-500 border-white shadow-sm"
                     />
                   </div>
-                  <div className="hidden sm:block text-left">
-                    <span className="block font-medium text-sm" style={{ color: 'var(--foreground)' }}>{user?.name}</span>
-                    <span className="block text-xs" style={{ color: 'var(--muted-foreground)' }}>@{user?.name?.toLowerCase().replace(/\s+/g, '') || 'user'}</span>
+                  <div className="hidden sm:block text-left min-w-0 flex-1">
+                    <span className="block font-medium text-xs sm:text-sm truncate" style={{ color: 'var(--foreground)' }}>{user?.name}</span>
+                    <span className="block text-xs truncate" style={{ color: 'var(--muted-foreground)' }}>@{user?.name?.toLowerCase().replace(/\s+/g, '') || 'user'}</span>
                   </div>
                 </motion.button>
                 
@@ -256,7 +274,7 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-3 min-w-[280px] py-3 z-50"
+                      className="absolute right-0 mt-3 min-w-[250px] sm:min-w-[280px] max-w-[90vw] py-3 z-50"
                       style={{ 
                         boxShadow: '0 12px 40px 0 rgba(0,0,0,0.25)',
                         background: 'var(--card)',
@@ -266,26 +284,26 @@ const Navbar = () => {
                         backdropFilter: 'blur(20px)'
                       }}
                     >
-                      <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
-                        <div className="flex items-center space-x-4">
-                          <div className="relative">
+                      <div className="px-4 sm:px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <div className="relative flex-shrink-0">
                             <img
                               src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=6366f1&color=fff`}
                               alt="Avatar"
-                              className="w-14 h-14 rounded-full object-cover border-2 shadow-lg"
+                              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 shadow-lg"
                               style={{ borderColor: 'var(--primary)' }}
                             />
-                                                         <div 
-                               className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 bg-green-500 border-white shadow-sm"
-                             />
+                            <div 
+                              className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 bg-green-500 border-white shadow-sm"
+                            />
                           </div>
-                          <div>
-                            <span className="block font-semibold text-lg" style={{ color: 'var(--foreground)' }}>{user?.name}</span>
-                            <span className="block text-sm" style={{ color: 'var(--muted-foreground)' }}>{user?.email}</span>
+                          <div className="min-w-0 flex-1">
+                            <span className="block font-semibold text-base sm:text-lg truncate" style={{ color: 'var(--foreground)' }}>{user?.name}</span>
+                            <span className="block text-xs sm:text-sm truncate" style={{ color: 'var(--muted-foreground)' }}>{user?.email}</span>
                             <div className="flex items-center gap-2 mt-1">
-                                                             <div 
-                                 className="w-2 h-2 rounded-full bg-green-500"
-                               />
+                              <div 
+                                className="w-2 h-2 rounded-full bg-green-500"
+                              />
                               <span className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>Online</span>
                             </div>
                           </div>
@@ -300,7 +318,7 @@ const Navbar = () => {
                           <Link
                             key={item.to}
                             to={item.to}
-                            className="flex items-center space-x-3 px-6 py-3 hover:bg-[var(--muted)] rounded-lg transition-all duration-200 mx-2 group"
+                            className="flex items-center space-x-3 px-4 sm:px-6 py-3 hover:bg-[var(--muted)] rounded-lg transition-all duration-200 mx-2 group"
                             onClick={() => setDropdownOpen(false)}
                             style={{ color: 'var(--foreground)' }}
                           >
@@ -310,7 +328,7 @@ const Navbar = () => {
                             >
                               {item.icon}
                             </motion.div>
-                            <span className="font-medium">{item.label}</span>
+                            <span className="font-medium text-sm sm:text-base">{item.label}</span>
                           </Link>
                         ))}
                       </div>
@@ -319,7 +337,7 @@ const Navbar = () => {
                           whileHover={{ scale: 1.02, x: 5 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={handleLogout}
-                          className="flex items-center space-x-3 px-6 py-3 w-full hover:bg-[var(--destructive)] hover:bg-opacity-10 rounded-lg transition-all duration-200 mx-2 group"
+                          className="flex items-center space-x-3 px-4 sm:px-6 py-3 w-full hover:bg-[var(--destructive)] hover:bg-opacity-10 rounded-lg transition-all duration-200 mx-2 group"
                           style={{ color: 'var(--destructive)' }}
                         >
                           <motion.div
@@ -328,7 +346,7 @@ const Navbar = () => {
                           >
                             <LogOut size={18} />
                           </motion.div>
-                          <span className="font-medium">Logout</span>
+                          <span className="font-medium text-sm sm:text-base">Logout</span>
                         </motion.button>
                       </div>
                     </motion.div>
@@ -407,15 +425,15 @@ const Navbar = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden py-6 border-t"
+              className="md:hidden py-8 px-6 border-t"
               style={{ borderColor: 'var(--border)' }}
             >
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {navLinks.map(link => (
                   <Link
                     key={link.to}
                     to={link.to}
-                    className={`flex items-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
+                    className={`flex items-center space-x-3 px-8 py-5 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
                       location.pathname === link.to
                         ? 'shadow-lg'
                         : 'hover:bg-[var(--muted)]'
@@ -440,7 +458,7 @@ const Navbar = () => {
                 {isAuthenticated && (
                   <Link
                     to="/create"
-                    className="flex items-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-300 shadow-xl relative overflow-hidden group"
+                    className="flex items-center space-x-3 px-8 py-5 rounded-xl font-medium transition-all duration-300 shadow-xl relative overflow-hidden group"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
                       color: 'var(--primary-foreground)' 

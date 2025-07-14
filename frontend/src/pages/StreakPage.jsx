@@ -174,16 +174,16 @@ const StreakPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-var(--color-bg-primary) py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-var(--color-bg-primary) py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-4xl font-bold text-var(--color-text-primary)">
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+            <h1 className="text-2xl sm:text-4xl font-bold text-var(--color-text-primary)">
               Your Streak Dashboard
             </h1>
             <button
@@ -192,13 +192,13 @@ const StreakPage = () => {
                 fetchStreakData();
                 fetchBadges();
               }}
-              className="px-4 py-2 bg-var(--color-primary) text-white rounded-lg hover:bg-var(--color-primary-dark) transition-colors duration-200 flex items-center gap-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 bg-var(--color-primary) text-white rounded-lg hover:bg-var(--color-primary-dark) transition-colors duration-200 flex items-center gap-2 text-sm sm:text-base"
             >
               <span>🔄</span>
               Refresh
             </button>
           </div>
-          <p className="text-var(--color-text-secondary) max-w-2xl mx-auto">
+          <p className="text-var(--color-text-secondary) max-w-2xl mx-auto text-sm sm:text-base">
             Track your daily contributions, maintain your streak, and earn badges for your dedication to blogging.
           </p>
         </motion.div>
@@ -207,14 +207,14 @@ const StreakPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-center mb-8"
+          className="flex justify-center mb-6 sm:mb-8"
         >
-          <div className="bg-var(--color-bg-secondary) rounded-lg p-1 border border-var(--color-border)">
+          <div className="bg-var(--color-bg-secondary) rounded-lg p-1 border border-var(--color-border) flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 sm:px-6 sm:py-3 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-var(--color-primary) text-white shadow-lg'
                     : 'text-var(--color-text-secondary) hover:text-var(--color-text-primary) hover:bg-var(--color-bg-primary)'
@@ -236,12 +236,12 @@ const StreakPage = () => {
           transition={{ duration: 0.3 }}
         >
           {activeTab === 'calendar' && (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {/* Quick Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-var(--color-bg-secondary) p-6 rounded-xl border border-var(--color-border)"
+                className="bg-var(--color-bg-secondary) p-4 sm:p-6 rounded-xl border border-var(--color-border) overflow-x-auto"
               >
                 <StreakStats stats={streakData} />
               </motion.div>
@@ -251,9 +251,10 @@ const StreakPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
+                className="overflow-x-auto"
               >
                 <ContributionCalendar 
-                  data={streakData} 
+                  data={streakData?.calendarData || []} 
                   onDayClick={handleDayClick}
                 />
               </motion.div>
@@ -261,14 +262,14 @@ const StreakPage = () => {
           )}
 
           {activeTab === 'stats' && (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {/* Detailed Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-var(--color-bg-secondary) p-6 rounded-xl border border-var(--color-border)"
+                className="bg-var(--color-bg-secondary) p-4 sm:p-6 rounded-xl border border-var(--color-border) overflow-x-auto"
               >
-                <h3 className="text-2xl font-semibold text-var(--color-text-primary) mb-6">
+                <h3 className="text-lg sm:text-2xl font-semibold text-var(--color-text-primary) mb-4 sm:mb-6">
                   Detailed Statistics
                 </h3>
                 <StreakStats stats={streakData} />
@@ -279,36 +280,36 @@ const StreakPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-var(--color-bg-secondary) p-6 rounded-xl border border-var(--color-border)"
+                className="bg-var(--color-bg-secondary) p-4 sm:p-6 rounded-xl border border-var(--color-border) overflow-x-auto"
               >
-                <h3 className="text-2xl font-semibold text-var(--color-text-primary) mb-6">
+                <h3 className="text-lg sm:text-2xl font-semibold text-var(--color-text-primary) mb-4 sm:mb-6">
                   Activity Breakdown
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                   <div className="text-center">
-                    <div className="text-4xl mb-2">📝</div>
-                    <div className="text-2xl font-bold text-var(--color-text-primary)">
+                    <div className="text-2xl sm:text-4xl mb-2">📝</div>
+                    <div className="text-xl sm:text-2xl font-bold text-var(--color-text-primary)">
                       {streakData?.totalPosts || 0}
                     </div>
                     <div className="text-var(--color-text-secondary)">Total Posts</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl mb-2">❤️</div>
-                    <div className="text-2xl font-bold text-var(--color-text-primary)">
+                    <div className="text-2xl sm:text-4xl mb-2">❤️</div>
+                    <div className="text-xl sm:text-2xl font-bold text-var(--color-text-primary)">
                       {streakData?.totalLikesReceived || 0}
                     </div>
                     <div className="text-var(--color-text-secondary)">Likes Received</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl mb-2">👍</div>
-                    <div className="text-2xl font-bold text-var(--color-text-primary)">
+                    <div className="text-2xl sm:text-4xl mb-2">👍</div>
+                    <div className="text-xl sm:text-2xl font-bold text-var(--color-text-primary)">
                       {streakData?.calendarData?.reduce((sum, day) => sum + day.likes, 0) || 0}
                     </div>
                     <div className="text-var(--color-text-secondary)">Likes Given</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl mb-2">💬</div>
-                    <div className="text-2xl font-bold text-var(--color-text-primary)">
+                    <div className="text-2xl sm:text-4xl mb-2">💬</div>
+                    <div className="text-xl sm:text-2xl font-bold text-var(--color-text-primary)">
                       {streakData?.calendarData?.reduce((sum, day) => sum + day.comments, 0) || 0}
                     </div>
                     <div className="text-var(--color-text-secondary)">Comments</div>
@@ -319,13 +320,13 @@ const StreakPage = () => {
           )}
 
           {activeTab === 'badges' && (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-var(--color-bg-secondary) p-6 rounded-xl border border-var(--color-border)"
+                className="bg-var(--color-bg-secondary) p-4 sm:p-6 rounded-xl border border-var(--color-border) overflow-x-auto"
               >
-                <h3 className="text-2xl font-semibold text-var(--color-text-primary) mb-6">
+                <h3 className="text-lg sm:text-2xl font-semibold text-var(--color-text-primary) mb-4 sm:mb-6">
                   Your Badges
                 </h3>
                 <BadgesDisplay badges={badges} />
@@ -336,9 +337,9 @@ const StreakPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-var(--color-bg-secondary) p-6 rounded-xl border border-var(--color-border)"
+                className="bg-var(--color-bg-secondary) p-4 sm:p-6 rounded-xl border border-var(--color-border) overflow-x-auto"
               >
-                <h3 className="text-2xl font-semibold text-var(--color-text-primary) mb-6">
+                <h3 className="text-lg sm:text-2xl font-semibold text-var(--color-text-primary) mb-4 sm:mb-6">
                   Badge Progress
                 </h3>
                 <div className="space-y-4">
@@ -350,16 +351,15 @@ const StreakPage = () => {
                   ].map((badge) => {
                     const progress = Math.min((badge.current / badge.requirement) * 100, 100);
                     const earned = badge.current >= badge.requirement;
-                    
                     return (
                       <div key={badge.id} className="flex items-center space-x-4">
-                        <div className="text-2xl">{badge.icon}</div>
+                        <div className="text-xl sm:text-2xl">{badge.icon}</div>
                         <div className="flex-1">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium text-var(--color-text-primary)">
+                          <div className="flex justify-between items-center mb-1 sm:mb-2">
+                            <span className="font-medium text-var(--color-text-primary) text-xs sm:text-base">
                               {badge.name}
                             </span>
-                            <span className="text-sm text-var(--color-text-secondary)">
+                            <span className="text-xs sm:text-sm text-var(--color-text-secondary)">
                               {badge.current}/{badge.requirement}
                             </span>
                           </div>
@@ -373,7 +373,7 @@ const StreakPage = () => {
                           </div>
                         </div>
                         {earned && (
-                          <div className="text-var(--color-accent) text-xl">✓</div>
+                          <div className="text-var(--color-accent) text-lg sm:text-xl">✓</div>
                         )}
                       </div>
                     );

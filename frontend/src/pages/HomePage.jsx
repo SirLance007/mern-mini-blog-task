@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../utils/config';
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
@@ -39,7 +40,7 @@ const HomePage = () => {
         params.append('category', selectedCategory);
       }
       
-      const response = await axios.get(`http://localhost:3000/api/posts?${params}`);
+      const response = await axios.get(`${API_BASE_URL}/posts?${params}`);
       
       if (page === 1) {
         setPosts(response.data.data.posts);
@@ -107,7 +108,7 @@ const HomePage = () => {
     setDeletingPosts(prev => new Set([...prev, postToDelete]));
     
     try {
-      await axios.delete(`http://localhost:3000/api/posts/${postToDelete}`);
+      await axios.delete(`${API_BASE_URL}/posts/${postToDelete}`);
       
       // Remove the post from local state
       setPosts(prev => prev.filter(post => post._id !== postToDelete));
@@ -313,25 +314,93 @@ const HomePage = () => {
       </motion.div>
 
       {/* Category Filters */}
-      <motion.div variants={itemVariants} className="mb-8">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {categories.map((category) => (
-            <motion.button
-              key={category.value}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setSelectedCategory(category.value);
-                setPage(1);
-              }}
-              style={selectedCategory === category.value
-                ? { background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)' }
-                : { background: 'var(--muted)', color: 'var(--muted-foreground)', borderRadius: 'var(--radius)' }}
-              className="px-4 py-2 text-sm font-medium transition-all duration-200 shadow hover:shadow-md"
+      <motion.div variants={itemVariants} className="mb-8 px-4 sm:px-6">
+        <div className="card p-4 sm:p-6" style={{ 
+          background: 'var(--card)', 
+          color: 'var(--card-foreground)',
+          borderRadius: 'var(--radius)',
+          border: '1px solid var(--border)'
+        }}>
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
+              Filter by Category
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              Choose a category to explore specific topics
+            </p>
+          </div>
+          
+          {/* Mobile: Scrollable horizontal list */}
+          <div className="md:hidden">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map((category) => (
+                <motion.button
+                  key={category.value}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setSelectedCategory(category.value);
+                    setPage(1);
+                  }}
+                  style={selectedCategory === category.value
+                    ? { background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)' }
+                    : { background: 'var(--muted)', color: 'var(--muted-foreground)', borderRadius: 'var(--radius)' }}
+                  className="flex-shrink-0 px-4 py-3 text-sm font-medium transition-all duration-200 shadow hover:shadow-md whitespace-nowrap"
+                >
+                  {category.label}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop: Grid layout */}
+          <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-8 gap-2">
+            {categories.map((category) => (
+              <motion.button
+                key={category.value}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setSelectedCategory(category.value);
+                  setPage(1);
+                }}
+                style={selectedCategory === category.value
+                  ? { background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)' }
+                  : { background: 'var(--muted)', color: 'var(--muted-foreground)', borderRadius: 'var(--radius)' }}
+                className="px-3 py-2 text-sm font-medium transition-all duration-200 shadow hover:shadow-md"
+              >
+                {category.label}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Active filter indicator */}
+          {selectedCategory !== 'all' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 text-center"
             >
-              {category.label}
-            </motion.button>
-          ))}
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium" style={{ 
+                background: 'var(--primary)', 
+                color: 'var(--primary-foreground)' 
+              }}>
+                <span>Active:</span>
+                <span>{categories.find(c => c.value === selectedCategory)?.label}</span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setPage(1);
+                  }}
+                  className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                >
+                  ×
+                </motion.button>
+              </span>
+            </motion.div>
+          )}
         </div>
       </motion.div>
 

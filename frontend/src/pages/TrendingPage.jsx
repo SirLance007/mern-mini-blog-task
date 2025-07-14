@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { TrendingUp, Clock, Eye, Heart, Calendar, Filter, MessageCircle, Share2 } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLikes } from '../context/LikeContext';
 import Loading from '../components/Loading';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../utils/config';
 
 const TrendingPage = () => {
   const [posts, setPosts] = useState([]);
@@ -15,6 +16,8 @@ const TrendingPage = () => {
   const [sortBy, setSortBy] = useState('trending');
   const { user } = useAuth();
   const { isLiked, toggleLike } = useLikes();
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef(null);
 
   const timeFrames = [
     { value: 'day', label: 'Today', icon: Clock },
@@ -33,10 +36,25 @@ const TrendingPage = () => {
     fetchTrendingPosts();
   }, [timeFrame, sortBy]);
 
+  // Close dropdown on click outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target)) {
+        setSortDropdownOpen(false);
+      }
+    }
+    if (sortDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [sortDropdownOpen]);
+
   const fetchTrendingPosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:3000/api/posts/trending?timeFrame=${timeFrame}&limit=20`);
+      const response = await axios.get(`${API_BASE_URL}/posts/trending?timeFrame=${timeFrame}&limit=20`);
       setPosts(response.data.data.posts);
     } catch (error) {
       setError('Failed to fetch trending posts');
@@ -68,6 +86,8 @@ const TrendingPage = () => {
         }
         return post;
       }));
+      // Trigger streak calendar update
+      window.dispatchEvent(new Event('streak-data-update'));
     }
   };
 
@@ -77,8 +97,22 @@ const TrendingPage = () => {
   };
 
   const handleShare = (postId) => {
-    // For now, just show an alert. In a real app, this would open a share modal
-    alert(`Share functionality for post ${postId} - This would open a share modal in a real app!`);
+    const url = `${window.location.origin}/post/${postId}`;
+    const title = 'Check out this trending post!';
+    if (navigator.share) {
+      navigator.share({
+        title,
+        url,
+      }).catch(() => {
+        toast.error('Share cancelled or failed.');
+      });
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        toast.success('Link copied to clipboard!');
+      }, () => {
+        toast.error('Failed to copy link.');
+      });
+    }
   };
 
   const formatDate = (dateString) => {
@@ -318,59 +352,90 @@ const TrendingPage = () => {
 
       {/* Filters */}
       <motion.div variants={itemVariants} className="mb-8">
-        <div className="card p-6" style={{ background: 'var(--card)', color: 'var(--card-foreground)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex items-center space-x-2">
+        <div className="card p-4 sm:p-6" style={{ background: 'var(--card)', color: 'var(--card-foreground)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center space-x-2 mb-2 md:mb-0">
               <Filter className="w-5 h-5" style={{ color: 'var(--muted-foreground)' }} />
               <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Filters:</span>
             </div>
-            
-            <div className="flex flex-wrap gap-2">
-              {timeFrames.map((frame) => (
-                <motion.button
-                  key={frame.value}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setTimeFrame(frame.value)}
-                  style={timeFrame === frame.value
-                    ? { background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)' }
-                    : { background: 'var(--muted)', color: 'var(--muted-foreground)', borderRadius: 'var(--radius)' }}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium transition-all duration-200 shadow hover:shadow-md"
-                >
-                  <frame.icon size={16} />
-                  <span>{frame.label}</span>
-                </motion.button>
-              ))}
+            {/* TimeFrame Buttons - Mobile: horizontal scroll, Desktop: wrap */}
+            <div className="w-full md:w-auto">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 md:overflow-visible md:flex-wrap">
+                {timeFrames.map((frame) => (
+                  <motion.button
+                    key={frame.value}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setTimeFrame(frame.value)}
+                    style={timeFrame === frame.value
+                      ? { background: 'var(--primary)', color: 'var(--primary-foreground)', borderRadius: 'var(--radius)' }
+                      : { background: 'var(--muted)', color: 'var(--muted-foreground)', borderRadius: 'var(--radius)' }}
+                    className="flex items-center space-x-2 flex-shrink-0 px-4 py-2 text-sm font-medium transition-all duration-200 shadow hover:shadow-md whitespace-nowrap"
+                  >
+                    <frame.icon size={16} />
+                    <span>{frame.label}</span>
+                  </motion.button>
+                ))}
+              </div>
             </div>
-
-            <div className="flex items-center space-x-2 relative">
+            {/* Custom Sort Dropdown */}
+            <div className="w-full md:w-auto flex items-center space-x-2 relative" ref={sortDropdownRef}>
               <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Sort by:</span>
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  style={{ 
-                    background: 'var(--input)', 
-                    color: 'var(--input-foreground)', 
-                    border: '1px solid var(--border)', 
+              <div className="relative w-full md:w-auto">
+                <button
+                  type="button"
+                  className="w-full md:w-auto flex items-center justify-between px-3 py-2 text-sm rounded-lg border transition-all outline-none pr-8 focus:ring-2 focus:ring-primary focus:border-primary"
+                  style={{
+                    background: 'var(--input)',
+                    color: 'var(--input-foreground)',
+                    border: '1px solid var(--border)',
                     borderRadius: 'var(--radius)',
-                    appearance: 'none',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    paddingRight: '2.5rem',
                   }}
-                  className="px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none pr-10"
+                  onClick={() => setSortDropdownOpen((v) => !v)}
+                  aria-haspopup="listbox"
+                  aria-expanded={sortDropdownOpen}
                 >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value} className="bg-[var(--input)] text-[var(--input-foreground)]">
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {/* Custom arrow icon */}
-                <svg className="pointer-events-none absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                  {sortOptions.find((o) => o.value === sortBy)?.label}
+                  <svg className="ml-2 w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <AnimatePresence>
+                  {sortDropdownOpen && (
+                    <motion.ul
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-0 mt-2 w-full md:w-56 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-xl z-50 overflow-hidden"
+                      style={{ color: 'var(--card-foreground)' }}
+                      tabIndex={-1}
+                      role="listbox"
+                    >
+                      {sortOptions.map((option) => (
+                        <li
+                          key={option.value}
+                          role="option"
+                          aria-selected={sortBy === option.value}
+                          tabIndex={0}
+                          className={`px-4 py-3 text-sm cursor-pointer transition-all duration-150 hover:bg-[var(--muted)] focus:bg-[var(--muted)] ${sortBy === option.value ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : ''}`}
+                          onClick={() => {
+                            setSortBy(option.value);
+                            setSortDropdownOpen(false);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              setSortBy(option.value);
+                              setSortDropdownOpen(false);
+                            }
+                          }}
+                        >
+                          {option.label}
+                        </li>
+                      ))}
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>

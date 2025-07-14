@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/config';
 
 const LikeContext = createContext();
 
@@ -22,7 +23,7 @@ export const LikeProvider = ({ children }) => {
 
   const fetchUserLikes = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/posts/liked');
+      const response = await axios.get(`${API_BASE_URL}/posts/liked`);
       const likedPostIds = new Set(response.data.data.posts.map(post => post._id));
       setLikedPosts(likedPostIds);
     } catch (error) {
@@ -32,7 +33,7 @@ export const LikeProvider = ({ children }) => {
 
   const fetchUserSaves = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/posts/saved');
+      const response = await axios.get(`${API_BASE_URL}/posts/saved`);
       const savedPostIds = new Set(response.data.data.posts.map(post => post._id));
       setSavedPosts(savedPostIds);
     } catch (error) {
@@ -44,7 +45,7 @@ export const LikeProvider = ({ children }) => {
     if (!isAuthenticated) return false;
 
     try {
-      await axios.put(`http://localhost:3000/api/posts/${postId}/like`);
+      await axios.put(`${API_BASE_URL}/posts/${postId}/like`);
       
       const newLikedPosts = new Set(likedPosts);
       if (newLikedPosts.has(postId)) {
@@ -68,11 +69,11 @@ export const LikeProvider = ({ children }) => {
       const newSavedPosts = new Set(savedPosts);
       if (newSavedPosts.has(postId)) {
         // Unsave
-        await axios.delete(`http://localhost:3000/api/posts/${postId}/save`);
+        await axios.delete(`${API_BASE_URL}/posts/${postId}/save`);
         newSavedPosts.delete(postId);
       } else {
         // Save
-        await axios.post(`http://localhost:3000/api/posts/${postId}/save`);
+        await axios.post(`${API_BASE_URL}/posts/${postId}/save`);
         newSavedPosts.add(postId);
       }
       setSavedPosts(newSavedPosts);

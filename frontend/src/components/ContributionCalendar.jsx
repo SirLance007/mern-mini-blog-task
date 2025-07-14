@@ -8,7 +8,6 @@ const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const getColor = (level = 0, hasPosts = false) => {
   // If user posted on this day, show orange regardless of activity level
   if (hasPosts) {
-    console.log('[getColor] Returning orange for posts:', '#ff6b35');
     return '#ff6b35'; // Bright orange for posting days
   }
   
@@ -19,6 +18,12 @@ const getColor = (level = 0, hasPosts = false) => {
     case 4: return 'var(--chart-5)';
     default: return 'var(--card-foreground)';
   }
+};
+
+// Add this helper function near the top:
+const getCellColorClass = (posts) => {
+  if (posts > 0) return 'bg-orange-500'; // Orange for post days
+  return 'bg-gray-100'; // Default for no posts
 };
 
 // Get the start date for year, month, or week view
@@ -65,15 +70,11 @@ const createYearDayMap = (calendarData) => {
   
   // Fill in the actual data from calendarData
   if (calendarData && Array.isArray(calendarData)) {
-    console.log('[createYearDayMap] Processing calendar data:', calendarData.length, 'items');
     calendarData.forEach((day, index) => {
-      console.log('[createYearDayMap] Processing day:', day);
       if (yearMap.has(day.date)) {
         const existing = yearMap.get(day.date);
         const posts = day.posts || 0;
         const hasPosts = posts > 0;
-        
-        console.log('[createYearDayMap] Setting day:', day.date, 'posts:', posts, 'hasPosts:', hasPosts);
         
         yearMap.set(day.date, {
           ...existing,
@@ -84,8 +85,6 @@ const createYearDayMap = (calendarData) => {
           level: day.level || 0,
           hasPosts: hasPosts
         });
-      } else {
-        console.log('[createYearDayMap] Day not found in year map:', day.date);
       }
     });
   }
@@ -96,13 +95,7 @@ const createYearDayMap = (calendarData) => {
 const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }) => {
   // Create the year day map
   const yearDayMap = useMemo(() => {
-    console.log('[ContributionCalendar] Creating year day map with data:', data);
     const map = createYearDayMap(data?.calendarData);
-    
-    // Log post days
-    const postDays = Array.from(map.values()).filter(day => day.hasPosts);
-    console.log('[ContributionCalendar] Found post days:', postDays.map(d => d.dateStr));
-    console.log('[ContributionCalendar] Total post days:', postDays.length);
     
     return map;
   }, [data]);
@@ -132,10 +125,6 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
           level: 0,
           hasPosts: false
         };
-        
-        if (dayData.hasPosts) {
-          console.log('[ContributionCalendar] Found post day in grid:', dateStr, 'posts:', dayData.posts);
-        }
         
         week.push({
           date,
@@ -242,17 +231,17 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="w-full max-w-5xl mx-auto p-6 rounded-2xl shadow-2xl border border-[var(--border)] bg-[var(--card)] backdrop-blur-lg"
+      className="w-full max-w-5xl mx-auto p-2 sm:p-4 md:p-6 rounded-2xl shadow-2xl border border-[var(--border)] bg-[var(--card)] backdrop-blur-lg"
       style={{ minHeight: 220 }}
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-        <div className="flex items-center gap-2 text-xl font-semibold text-[var(--primary)]">
+        <div className="flex items-center gap-2 text-base sm:text-xl font-semibold text-[var(--primary)]">
           <span>{data?.totalContributions || 0}</span>
-          <span className="text-[var(--card-foreground)] font-normal">submissions in the past one year</span>
+          <span className="text-[var(--card-foreground)] font-normal">posts in the past year</span>
           <span className="ml-1 text-xs" title="How is this calculated?">🛈</span>
         </div>
-        <div className="flex gap-6 text-sm text-[var(--muted-foreground)]">
+        <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-[var(--muted-foreground)]">
           <span>Total active days: <span className="text-[var(--primary)] font-semibold">{data?.calendarData?.filter(d => d.activity > 0).length || 0}</span></span>
           <span>Max streak: <span className="text-[var(--primary)] font-semibold">{data?.longestStreak || 0}</span></span>
           {/* View filter dropdown */}
@@ -270,15 +259,15 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
         </div>
       </div>
       {/* Calendar grid */}
-      <div className="flex">
+      <div className="flex flex-row items-start overflow-x-auto scrollbar-hide pb-2 w-full max-w-full touch-pan-x">
         {/* Day labels (vertical) */}
-        <div className="flex flex-col justify-end mr-2">
+        <div className="flex flex-col justify-end mr-1 sm:mr-2">
           {DAYS.map((d, i) => (
-            <div key={d} className={`h-5 text-xs text-[var(--muted-foreground)] ${i % 2 === 0 ? '' : 'opacity-60'}`}>{d[0]}</div>
+            <div key={d} className={`h-6 sm:h-5 text-xs text-[var(--muted-foreground)] ${i % 2 === 0 ? '' : 'opacity-60'}`}>{d[0]}</div>
           ))}
         </div>
         {/* Weeks grid with gap */}
-        <div className="flex-1 overflow-x-auto">
+        <div className="flex-1 min-w-[320px] sm:min-w-[420px] md:min-w-[600px] lg:min-w-[800px]">
           <div className="flex gap-1">
             {/* Month labels */}
             {weeks.map((week, wIdx) => (
@@ -294,33 +283,19 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
                   const isToday = day.date.toDateString() === today.toDateString();
                   const hasPosts = day.hasPosts;
                   const backgroundColor = getColor(day.level, hasPosts);
-                  
-                  if (hasPosts) {
-                    console.log('[ContributionCalendar] Rendering day with posts:', day.dateStr, 'posts:', day.posts);
-                    console.log('[ContributionCalendar] Day level:', day.level, 'hasPosts:', hasPosts);
-                    console.log('[ContributionCalendar] WILL APPLY ORANGE COLOR TO:', day.dateStr);
-                  }
-                  
                   return (
                     <motion.div
                       key={dIdx}
-                      className={`w-5 h-5 rounded-[6px] mb-0.5 cursor-pointer border border-transparent relative group transition-all flex items-center justify-center`}
+                      className={`w-7 h-7 sm:w-5 sm:h-5 rounded-[6px] mb-0.5 cursor-pointer border border-transparent relative group transition-all flex items-center justify-center ${getCellColorClass(day.posts)}`}
                       style={{
+                        ...(day.posts > 0 ? { zIndex: 99999 } : {}),
                         backgroundColor: hasPosts ? '#ff6b35' : backgroundColor,
                         boxShadow: isToday ? '0 0 0 2px var(--primary)' : hasPosts ? '0 0 0 4px #ff6b35, 0 0 20px rgba(255, 107, 53, 0.8)' : undefined,
                         borderColor: isToday ? 'var(--primary)' : hasPosts ? '#ff6b35' : 'transparent',
                         opacity: day.level === 0 ? 0.25 : 1,
                         transition: 'background 0.2s, box-shadow 0.2s',
-                        zIndex: hasPosts ? 99999 : 'auto',
                         position: 'relative',
                         transform: hasPosts ? 'scale(1.1)' : 'scale(1)',
-                      }}
-                      onMouseEnter={() => {
-                        if (hasPosts) {
-                          console.log('[ContributionCalendar] Hovering over day with posts:', day.dateStr);
-                          console.log('[ContributionCalendar] Applied background color:', hasPosts ? '#ff6b35' : backgroundColor);
-                          console.log('[ContributionCalendar] Cell should be ORANGE for:', day.dateStr);
-                        }
                       }}
                       data-date={day.dateStr}
                       initial={{ scale: 0.7, opacity: 0 }}
@@ -338,7 +313,6 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
                           }}
                         />
                       )}
-                      
                       {/* Green dot for post days */}
                       {hasPosts && (
                         <span 
@@ -346,7 +320,6 @@ const ContributionCalendar = ({ data, view = 'year', selectedDate = new Date() }
                           style={{ zIndex: 999999 }}
                         />
                       )}
-                      
                       {/* Tooltip */}
                       <div className="absolute left-8 top-1/2 -translate-y-1/2 z-50 hidden group-hover:block">
                         <div className="px-3 py-2 rounded-lg shadow-lg border border-[var(--border)] bg-[var(--popover)] text-xs text-[var(--popover-foreground)]">

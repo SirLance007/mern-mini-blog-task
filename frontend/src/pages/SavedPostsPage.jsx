@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../utils/config';
 
 const SavedPostsPage = () => {
   const [posts, setPosts] = useState([]);
@@ -27,7 +28,7 @@ const SavedPostsPage = () => {
   const fetchSavedPosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3000/api/posts/saved');
+      const response = await axios.get(`${API_BASE_URL}/posts/saved`);
       setPosts(response.data.data.posts);
     } catch (error) {
       setError('Failed to fetch saved posts');
