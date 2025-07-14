@@ -8,10 +8,7 @@ export default defineConfig({
     port: 5174,
     host: true,
     proxy: {
-      '/api': process.env.VITE_BACKEND_URL || 'http://localhost:3000'
+      '/api': process.env.VITE_BACKEND_URL
     }
-  },
-  define: {
-    'process.env.VITE_BACKEND_URL': JSON.stringify(process.env.VITE_BACKEND_URL || 'http://localhost:3000')
   }
 }) 
