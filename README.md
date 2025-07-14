@@ -1,5 +1,6 @@
-<<<<<<< HEAD
 # BlogVista - MERN Stack Blog Application
+
+[🌐 Visit the live website](https://mern-mini-blog-task-1.onrender.com)
 
 A modern, full-stack blog application built with the MERN stack (MongoDB, Express.js, React, Node.js) featuring dark theme, authentication, and real-time features.
 
