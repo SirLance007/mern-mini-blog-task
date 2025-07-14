@@ -99,7 +99,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 md:px-8 lg:px-16 relative z-10">
         <div className="flex flex-wrap justify-between items-center h-14 xs:h-16 md:h-18 lg:h-20 gap-y-1 xs:gap-y-2">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 group min-w-0">
+          <Link to="/" className="flex items-center space-x-1 xs:space-x-2 sm:space-x-3 group min-w-0 flex-shrink-0">
             <motion.div 
               style={{ 
                 background: 'linear-gradient(135deg, var(--primary), var(--secondary))', 
@@ -145,7 +145,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 lg:space-x-3 ml-1 xs:ml-2 sm:ml-4 md:ml-8 lg:ml-12 overflow-x-auto scrollbar-hide max-w-full min-w-0">
+          <div className="hidden md:flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 lg:space-x-3 ml-1 xs:ml-2 sm:ml-4 md:ml-8 lg:ml-12 overflow-x-auto scrollbar-hide max-w-full min-w-0 flex-1 justify-end">
             {navLinks.map((link, index) => (
               <motion.div
                 key={link.to}
@@ -157,7 +157,7 @@ const Navbar = () => {
               >
                 <Link
                   to={link.to}
-                  className={`flex items-center space-x-2 px-5 py-2 md:px-6 lg:px-8 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
+                  className={`flex items-center space-x-1 xs:space-x-2 px-2 xs:px-3 sm:px-5 py-2 xs:py-2 md:px-6 lg:px-8 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
                     location.pathname === link.to
                       ? 'shadow-lg'
                       : 'hover:shadow-md'
@@ -182,9 +182,12 @@ const Navbar = () => {
                     whileHover={{ rotate: 5, scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {link.icon}
+                    {/* Responsive icon size */}
+                    <span className="block xs:hidden">{React.cloneElement(link.icon, { className: 'w-4 h-4' })}</span>
+                    <span className="hidden xs:block">{React.cloneElement(link.icon, { className: 'w-5 h-5 md:w-6 md:h-6' })}</span>
                   </motion.div>
                   <motion.span
+                    className="hidden xs:inline truncate"
                     whileHover={{ x: 2 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -193,7 +196,6 @@ const Navbar = () => {
                 </Link>
               </motion.div>
             ))}
-
           </div>
 
           {/* Right side */}
