@@ -32,7 +32,7 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FrontendURL || 'https://mern-mini-blog-task-1.onrender.com',
+  origin: 'https://mern-mini-blog-task-1.onrender.com',
   credentials: true
 }));
 
